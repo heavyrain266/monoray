@@ -1,0 +1,79 @@
+#pragma once
+
+#include <scene_rdl2/common/platform/Platform.isph>
+
+#include "LightTree.hh"
+#include "Light.isph"
+
+// =====================================================================================================================
+// References:
+// =====================================================================================================================
+// [1] Alejandro Conty Estevez and Christopher Kulla. 2018. 
+//     "Importance Sampling of Many Lights with Adaptive Tree Splitting"
+// =====================================================================================================================
+
+
+/// ----------------------------------------------- LightTreeCone ------------------------------------------------------
+/// This struct represents the orientation cone that bounds the normals and emission falloff for a cluster of lights. 
+/// We use this LightTreeCone structure to 1) decide how to cluster lights, 2) calculate the material and geometric terms
+/// for the importance heuristic. 
+///
+/// @see [1] section 4.1
+
+struct LightTreeCone
+{
+    LIGHT_TREE_CONE_MEMBERS;
+};
+
+
+
+// ------------------------------------------- LightTreeNode -----------------------------------------------------------
+/// A LightTreeNode represents a cluster in our LightTree. @see [1] section 4.1
+
+struct LightTreeNode
+{
+    LIGHT_TREE_NODE_MEMBERS;
+};
+
+/// ------------------------------------- Inline Utils --------------------------------------------------
+
+/// Is this node a leaf?
+inline uniform bool LightTreeNode_isLeaf(const uniform LightTreeNode& node) 
+{ 
+    return node.mLightCount == 1; 
+}
+/// Get center of node
+inline uniform Vec3f LightTreeNode_getCenter(const uniform LightTreeNode& node)
+{
+    return 0.5f * (node.mBBox.lower + node.mBBox.upper);
+}
+/// Get the index of the node's right child
+inline uniform uint LightTreeNode_getRightNodeIndex(const uniform LightTreeNode& node)
+{ 
+    return node.mRightNodeIndex; 
+}
+/// Get the number of lights in this node
+inline uniform uint LightTreeNode_getLightCount(const uniform LightTreeNode& node)
+{ 
+    return node.mLightCount; 
+}
+/// Gets the light index, if it's a leaf. Otherwise, returns -1.
+inline uniform int LightTreeNode_getLightIndex(const uniform LightTreeNode& node)
+{ 
+    return node.mLightIndex;
+}
+/// Gets the bounding box of the node
+inline const uniform BBox3f& LightTreeNode_getBBox(const uniform LightTreeNode& node)
+{ 
+    return node.mBBox;
+}
+/// Gets the energy variance
+inline uniform float LightTreeNode_getEnergyVariance(const uniform LightTreeNode& node)
+{ 
+    return node.mEnergyVariance;
+}
+/// Gets the energy mean
+inline uniform float LightTreeNode_getEnergyMean(const uniform LightTreeNode& node)
+{ 
+    return node.mEnergyMean;
+}
